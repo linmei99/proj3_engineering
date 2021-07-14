@@ -1,0 +1,33 @@
+                           Data Engineering Project Plan
+
+Design:
+Where should a small business owner open their first business, or to expand their existing business? To answer this question, we must know more about the customers and competitors of this type of business, on a geographic basis. 
+
+This project is to create a overlay map of potential customers and existing competitors, and identify locations where there is a large gap between the two, where a small business can best succeed. To limit the scope of the project, the business is limited to those having mainly residenal customers, instead of business and industrial customers. 
+
+To gauge the local customer base, where a small business can attract, several different parameters can be used. One is the US census data on population. One is the local sales tax recipes. And another one is the local property tax base.  
+
+To identify the competitors, the number of existing business in any particular business group are collected. 
+
+Then, for each geographic location, the density of a particular business type per population is compared to the average density of the entire population for this business type, and displayed in a web application. 
+
+Also, a projected number of business can be displayed versus the current number of business of a certain type, over the same map. 
+
+The type of business to be analyzed can be chosen from the app, i.e. food service, barber shop, etc. The comparison basis can also be chosen, like populatoin, local sales tax recipe, etc.
+
+Data:
+The primary data are acquired through Chicago open data portal, using open data API to obtain the current active business licence. This is an active database updated frequently. The population data from U.S. Census Bureau, and only updated yearly. The local sales tax recipe is obtained through State taxing authority, and updated monthly.
+
+Most of the data are in json format, and will be stored in a MongoDB.
+
+
+Algorithms:
+
+Based on the dataset at previous time period, a time series analysis can be applied to the number of business license to explore the leading and lagging relationship of various business groups in an economic cycle. From this, a projected number of business in a given type can be produced. This is used in conjection with the current number of business reported in the graphing.
+
+Tools:
+
+Database used is MongoDB. Data is acquired through open data API, in json format. Time series analysis will utilize various models in sklearn, and the output will use Tableau as a visulation tool, and shown in a web app using flask.
+
+
+
