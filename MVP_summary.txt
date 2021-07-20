@@ -1,0 +1,34 @@
+                           Data Engineering MVP summary
+
+Design:
+Competitive analysis is an important part of Business Intelligence. Where should a small business owner open their first business, or to expand their existing business? To answer this question, we must know more about the competitive landscape, based on the industrial type of the business. 
+
+This project is to provide an overview of the competitive landscape, based on a given business area. It allows the user to select from a drop down list of several hundred possible business activity, and gives a summary of the industry over the years. It covers the number of business over the years, the turn over rate. It also provides a list of the leaders in the business, their number of years in business and their geographic locations.  
+
+The app also allows a comparison of results from two different business activities, as some business activities are closely related and are competitors of each other.
+
+Data:
+The primary data are acquired through Chicago open data portal, using open data API to obtain the current active business licences, and all the previous business licenses going back to year 2002. This is an active database updated daily. After the app is build, it can be updated through the app to pull in the most recent information to aid in the analysis.
+
+There are a total of over 1 million business licenses in this dataset. There are a small number of licenses from before 2002, but it is highly incomplete. So the industrial wide analysis only starts from year 2003.
+
+There are over 50,000 active business license, covering more than 400 different business activities. 
+
+The raw data received over the API are in json format, and will be stored in a MongoDB.
+
+
+Algorithms:
+
+The data has many missing data points. There is a license code for every license, but it could be a general business license, and provides little utility to identify what the business is actually doing. The business activity field are often missing in the early periods, and even in year 2020, there are still about 10% of licenses missing the field. 
+
+So the licenses with missing data are included in graphs using license code, but missed when using the business activity id. About 1% of the license has the address listed outside Chicago, some as far as Miami. So only business with address in the city of Chicago are included in the final summary.
+
+When pulling the historial license info, there is a rate limit in the number of request per hour, so the waiting time for the remote serve to responde is long. Running the requests at off peak hours will greatly speed up the creation of the database.
+The mongoDB is too big to be included in the repo, so the app can be run only from the local machine where the DB is properly built. 
+
+
+Tools:
+
+Database used is MongoDB. Data is acquired through SODAPY open data API, in json format. A steamlit application is aimed for the presentation. In this MVP, the summary info can be provided for a given business code. The method for user to select the code from a list is to be provided in the Streamlit app later on. 
+
+
