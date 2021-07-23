@@ -1,59 +1,52 @@
                     				Data Engineering Project Summary
 
 Abstract:
-Do momentum exists in sporting events? How closely are the various stats in different quarters in the same basketball games related to each other? 
-This project attempts to present actual evidences in answering these questions, by examining two different stats, points scored and playing time, over the different quarters, in the same basketball game. 
-It then examines how predictive linear models can be for these type of problems and issues to handle them.
+Competitive analysis is an important part of Business Intelligence. If small business owners have choices, which business area should they go into? Where should  open their first business, or to expand their existing business?  To answer this question, we must know more about the competitive landscape, based on the industrial type of the business, and the area in general. 
+
+This project is to provide an overview of the competitive landscape, searchable for different business area in the city of Chicago. It allows the user to select from a drop down list of several hundred possible business activity and license code, and gives a summary of the industry over the years. It covers the number of business over the years, the turn over rate. It also provides a list of the leaders in the business, their number of years in business and their geographic locations.  
 
 Data:
-The primary data are acquired through web scraping using basketball-reference.com. The data obtained cover all regular season games over 3 entire NBA seasons from 2016-2019, a total of 3690 games. 
+The primary data are acquired through Chicago open data portal, using Socrata open data API to obtain the current active business licences, and all the previous business licenses going back to year 2002. This is an active database updated daily. After the app is build, it can be updated through the app to pull in the most recent information to aid in the analysis.
 
-For each season, the seasons schedule page is scrapped to come up a list of all games played in that season. For each game, there is a seperate web page, and the box score for each quarter are examined. The points scored, and playing time of the starting players and top reserves are recorded.  For each player that appeared in the game, their age, years drafted, and games played will be scrapped from a different player specific page. These formed the base data for the regression part of this project. 
+There are a total of over 1 million business licenses in this dataset. There are a small number of licenses from before 2003, but it is highly incomplete. So the industrial wide analysis only starts from year 2003.
 
-Each game consists of one data point, so a total of 3690 data points are used.  
+There are over 50,000 active business license, covering more than 400 different business activities. 
 
-Points scored by the home team and points scored by the visiting team, in each quarters are recorded. Also, the top players of each team, in terms of minutes played in the game, are recorded. The age of each of those players, the total games played by the player, and the minutes played in each quarter are recorded as features. Including players on home team and visiting team, a total of 130+ features are included for each data point. 
-
+The raw data received over the API are in json format, and will be stored in a MongoDB.
  
 Algorithms:
-There are two sets of targets. The points scored in a quarter, and the playing time of a player. For each of these targets, both linear regression models, and polynomial models are employed to examine the possible relationships between features and targets.
-For linear regression models, LASSO regularization, is employed to further evaluate the results. 
-The polynomial models at degree 2, show a large negative R2 value for low regularization values. After apply LASSO() model on the polynomial terms, the maximum R^2 found is close to linear results, with some improvements. 
-Since the total number of minutes played in a quarter by an entire team must adds up to 60 minutes, there could be a multi-colinearity issues when the playing time data. So only the playing time of the staring lineup are used, even though the playing time of up to 13 players are recorded. 
+The data has many missing data points. About 1% of the license has the address listed outside Chicago, some as far as Miami. So only business with address in the city of Chicago are included in the final summary. Some have missing GPS data, and will be filled with center of Chicago for mapping purpose.
 
-The regression results of points scored has a R^2 of essentially 0. The playing time showed a medium range R^2 value. The results are expected, as the points scored are widely known to be unpredictable. The playing time are heavily impacted by coaching decisions, and other in game situations, but a portion of patterns can still be learned from the data.  
+There is a license code for every license, but it could be a general business license, and provides little utility to identify what the business is actually doing. The business activity field are often missing in the early periods, and more than 50% of the licenses before 2010 do not have the business aera identified. Even in year 2020, there are still about 10% of licenses missing the field. 
 
-From the Statsmodel output, we can examine the parameters with coefficients that is statistical significant. If these paramters also appears in LASSO models selected from cross validations, they are examined to do an interpretation. The interpretation results are shown in the figures in the presentations. 
+A business could have multiple licenses over the years, and renew the licenses every few years. Their data will be consolidated into a new business database entry covering the entire period. This prevents double counting of the same business. 
 
-At first, only the playing time of the previous quarter are looked at as the features. Then playing time for all previous quarters, and not just the preceeding quarters are examined. This improves the results for certain cases, especially for the third quarter results. And finally, the games played are added as additional features to examine the change in R^2, this improved predictive results for the fourth quarter.
+Some license have expiration data earlier than the license start data, likely data entry error. They are counted as valid for 1 month at the start only. 
 
-WE can see the change in R^2, and examine the change in coefficients for interpretations.
+Some licenses appear to be back dated, starts in 2008 expires in 2009 but have date when license was issued in 2010. They are counted but are suspect, so results could be misleading. 
+
+ 
+
+The streamlit app is running off prepared data, which is generated via an init() function. Update the underlying database can be done via this init() function. When pulling the historial license info, there is a rate limit in the number of request per hour, so the waiting time for the remote server to responde is long. Refreshing the data can take a long time if the remote server is applying rate limits.
+
+The mongoDB is too big to be included in the repo, so the app can be run only from the local machine where the DB is properly built. 
 
 Tools:
 
-The web scraping is using BeautifulSoup, 
-After data is acquired, linear regression models, with regulation, are used to examine the data. Polynomial terms are also examined to see its impact on the linear regression.
+Database used is MongoDB. Data is acquired through Socrata open data API, in json format. A steamlit application run for the presentation. 
 
-StatModels are used to examine the resulting parameters's statistical significance.
-
+In this MVP, the summary info can be provided for a given business code. The method for user to select the code from a list is to be provided in the Streamlit app later on. 
 
 Results:
-1. The playing time model has a R2 around 0.1 to 0.3, depending on the position and quarter played. Most of the times, a player's playing time, has positive coefficient with his teammate's playing time in the proceeding quarter, and a large negative coefficient with his own playing time, in the preceeding quarter. 
+1. The StreamLit app allows the user to select either a license code, or a business activity to fine tune the type of business he/she may wish to examine. 
 
-The implication is fatigue is a major factor. This relationship is weaker in the third quarter, which has a long half time break. This further strengthens the fatigue interpretation. 
+2. For each category, a summary gives the number of active business in this category, and their average time in this business. The same data is also provided for all business in this category, past and present.
 
-The player experience has little impact on the model, until the model is applied to the fourth quarter. Adding player experience to the feature set improves the fourth quarter results, while having no impact to results from other quarters. 
+The turnover, the number of past versus present business can be seen from this. 
 
-2. The playing time in a quarter is bound to a lower limit of 0, and an upper limit of 720 seconds. This bounds limit the usefulness of linear models. The pairplot indicates the distribution of playing time has a normal like curve, except the tail of the distribution collapse into a single value at 720 seconds. A large variance of the prediction is due to the inability to match this bounded condition. 
+3. The number of business in this category from 2003 to present is plotted to show the general trend in this business. The number of license remain active up to 6 months in the future is plotted to indicate renewal trend, or risk of non-renewal. 
 
-A different model like decision tree needs to be utilized to handle such bounded condition better.
-
-3. Based on the results, the linear regression has low R2 values for the points scored as the target value. R2 is in range of 0.02. 
-
-Within the features, the t values from statmodels indicated that only one term is statistical significant. The point scored by one  team, is positivly co-related to the points scored by the other team in the proceeding quarters. 
-
-This result in point differential has a negative correlation quarter over quarter, or a regress to mean. 
-
-
-
+4. A map showing the location of all currently active business is provided. This can provide valuable info to business coverage, and competitive landscape.
+ 
+5. A more detailed information list of up to 10 business with the longest tenture is also provided for further competitive analysis. 
 
